@@ -10,7 +10,7 @@ class Board
   
   def fill_cups 
     @cups.each.with_index do |arry, index| 
-      next if index == 0 || index == 13
+      next if index == 6 || index == 13
         arry << :stone << :stone << :stone << :stone 
       end 
    
@@ -28,24 +28,39 @@ class Board
     raise "Invalid starting cup" if @cups[start_pos].empty?
   end
 
-  def make_move(start_pos, current_player_name)
+  def make_move(start_pos = 1, current_player_name = @name1)
+    stones = @cups[start_pos]
     @cups[start_pos] = []
     
-      stones = @cups[start_pos]
       pos = start_pos + 1
       until stones.empty? 
-        if current_player_name == @name1 
-          pos = 0 if pos == 0
-          @cups[pos] << stone.shift 
+        if  current_player_name == @name1 
+          pos = 0 if pos == 13
+          break if stones.empty?
+          @cups[pos] << stones.shift 
         else
-          pos = 8 if pos == 13
-          @cups[pos] << stone.shift 
+          pos = 0 if pos == 14
+          pos = 7 if pos == 6
+          break if stones.empty?
+          @cups[pos] << stones.shift 
         end
         pos += 1 
       end 
+      self.render
+      if @cups[pos].length == 1 
+         return :switch 
+      end
+        self.next_turn(pos)
        
   end
   
+  def switch
+    if @current_player == @name1 
+       @current_player = @name2
+    else 
+      @current_player = @name1 
+    end
+  end
 
   def next_turn(ending_cup_idx)
     # helper method to determine what #make_move returns
